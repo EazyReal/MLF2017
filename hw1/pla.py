@@ -1,6 +1,7 @@
 import numpy as np
 import sys
 import random
+import matplotlib.pyplot as plt
 
 filename = "./hw1_15_train.dat.txt"
 
@@ -11,7 +12,10 @@ with open(filename) as f:
 dataset = [line.strip().rsplit(None, 1) for line in dataset]
 dataset = [ [[1.0]+list(map(float, line[0].split())), int(line[1])] for line in dataset]
 dataset = np.array(dataset)
-#print(data[0])
+
+#graph data for hw1
+X = np.arange(100)
+Y = {}
 
 #setting
 DIMENSION = 5
@@ -47,17 +51,41 @@ def pla(dataset, key):
     return w, count
 
 if __name__ == "__main__":
-    key = list(range(len(dataset)))
-
+    #main program
     update_sum = 0.0
+    max_update = 0.0
+    max_count = 0
 
     for i in range(EPOCH):
+        key = list(range(len(dataset)))
         random.shuffle(key)
         w, update = pla(dataset, key)
         update_sum += update
+        if(Y.__contains__(update) == False) : Y[update] = 0
+        Y[update] += 1 
+        max_update = max(max_update, update)
+        max_count = max(max_count, Y[update])
 
-    print("update count = %f" %(update_sum/EPOCH))
+    print("average update = %f" %(update_sum/EPOCH))
 
+    #matplotlib
+    plt.title("update time with its freqeuncy")
+    plt.xlabel("update time")
+    plt.ylabel("frequency")
+
+    max_update = min(max_update, 100)
+
+    for i in range(max_update) :
+        if(Y.__contains__(i)):
+            plt.bar(X[i], Y[i], width = 0.35)
+
+    plt.xlim(0, max_update + 2)
+    plt.xticks()
+    plt.ylim(0, max_count + 50)
+    plt.yticks()
+
+    plt.savefig(fname = "histogram.png", format = "png")
+    plt.show()
 
 
 """
